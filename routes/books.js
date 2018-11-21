@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/books');
+mongoose.connect('mongodb://admin:sharepoint0@ds251332.mlab.com:51332/bookstore');
 
 let BookSchema = new mongoose.Schema({
   _id: Number,
@@ -14,8 +14,12 @@ let BookSchema = new mongoose.Schema({
   shortDescription: String,
   longDescription: String,
   status: String,
-  authors: [],
-  categories: [],
+  authors: [ 
+    { type: String }
+   ],
+  categories: [
+    { type: String }
+  ],
 });
 
 BookSchema.index({ 'title': 'text' });
@@ -59,7 +63,29 @@ router.get('/detail/:id', (req, res) => {
  * POST Create Book
  */
 router.post('/create', (req, res) => {
-  res.send('respond with a resource');
+  let newBook = new Book({
+    _id: req.body._id,
+    title: req.body.title,
+    isbn: req.body.isbn,
+    pageCount: req.body.pageCount,
+    publishedDate: req.body.publishedDate,
+    thumbnailUrl: req.body.thumbnailUrl,
+    shortDescription: req.body.shortDescription,
+    longDescription: req.body.longDescription,
+    status: req.body.status,
+    authors: req.body.authors,
+    categories: req.body.categories,
+  }); 
+
+  newBook.save((error, book) => {
+    if(error) {
+      console.log(error);
+      res.status(404).json(error);
+    } else {
+      res.status(200).json(book); 
+    } 
+  });
+
 });
 
 /**
